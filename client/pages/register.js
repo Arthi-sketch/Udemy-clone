@@ -6,37 +6,62 @@ import {
   UserOutlined,
   MailOutlined,
   LockOutlined,
-  DownloadOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import Link from "next/link";
 
 export default function Register() {
-  const [Username, setUsername] = useState("");
-  const [Password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [loading, setloading] = useState(false);
 
-  function handleSubmit(e)
-  {
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.table({Username, Password, email});
+    try {
+      setloading(true);
+      const { data } = await axios.post(`http://localhost:8000/api/register`, {
+        name,
+        email,
+        password,
+      });
+
+      toast(data);
+      // console.log(data);
+      setloading(false);
+    } 
+    catch (err) {   
+      toast(err.response.data);
+      // console.log(err.response);
+      setloading(false);
+    }
+    setName("");
+    setPassword("");
+    setEmail("");
   }
+
   return (
     <>
       <Header name="Register" />
-      <form class="col-md-4 container offset-md-4 pb-2" onSubmit={handleSubmit}>
+      <form class="col-md-4 container offset-md-4 pb-2 text-center" onSubmit={handleSubmit} >
         <Input
           prefix={<UserOutlined />}
           className="mb-4 p-2 rounded"
           placeholder="Username"
           allowClear
-          onChange={(e)=> setUsername(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
         <Input
           prefix={<MailOutlined />}
           className="mb-4 p-2 rounded"
           placeholder="Email"
           allowClear
-          onChange={(e)=> setPassword(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <Input.Password
           prefix={<LockOutlined />}
@@ -45,11 +70,24 @@ export default function Register() {
           iconRender={(visible) =>
             visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
           }
-          onChange={(e)=> setEmail(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit" class="btn btn-primary rounded col-12">
-          Submit
+
+        <button
+          type="submit"
+          class="btn btn-primary rounded col-12"
+          disabled={!name || !password || !email || loading}
+        >
+          {loading ? <SyncOutlined spin /> : "Submit"}
         </button>
+        <br/>
+        <br/>
+        
+        <div>
+          Already registered? <Link href="/login">Login</Link>
+        </div>
+        
       </form>
     </>
   );
