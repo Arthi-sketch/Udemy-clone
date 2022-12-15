@@ -3,40 +3,50 @@ import { Input } from "antd";
 import {
   EyeInvisibleOutlined,
   EyeTwoTone,
-  UserOutlined,
   MailOutlined,
   LockOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { Context } from "../context";
+import { useRouter } from 'next/router';
 
 export default function Login() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setloading] = useState(false);
 
+  const router=useRouter();
+  const {state, dispatch} = useContext(Context);
+  console.log("state: ", state);
+
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      // setloading(true);
+      setloading(true);
       const { data } = await axios.post(`http://localhost:8000/api/login`, {
         email,
         password,
       });
 
-      // toast(data);
-      // console.log(data);
-      // setloading(false);
+      //4. dispatch the context
+      dispatch({type: "Login", payload: data});
+      window.localStorage.setItem("user", JSON.stringify(data));
+
+      toast("Welcome "+data.name+" to this e-learning exposure!");
+      console.log("login res",data);
+      setloading(false);
+
+      router.push("/");
     } 
     catch (err) {   
-      // toast(err.response.data);
-      console.log(err.response);
-      // setloading(false);
+      toast(err.response.data);
+      console.log("login res",err.response.data);
+      setloading(false);
     }
-    setName("");
     setPassword("");
     setEmail("");
   }
@@ -77,7 +87,6 @@ export default function Login() {
         <div>
           Not yet registered? <Link href="/register">SIGN UP</Link>
         </div>
-        
       </form>
     </>
   );

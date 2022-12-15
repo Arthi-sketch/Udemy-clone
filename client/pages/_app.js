@@ -5,10 +5,12 @@ import "antd/dist/antd.css";
 import NavBar from "../comps/NavBar";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Provider } from "../context";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <>
+    //3. wrap the context
+    <Provider>
       <Head>
         <title>E-Learning Platform</title>
         <meta name="description" content="Elearning site" />
@@ -18,7 +20,7 @@ function MyApp({ Component, pageProps }) {
       <NavBar />
       <ToastContainer position="top-center"/>
       <Component {...pageProps} />
-    </>
+    </Provider>
   );
 }
 
