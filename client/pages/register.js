@@ -1,4 +1,4 @@
-import Header from "../comps/Header";
+import Header from "../components/Header";
 import { Input } from "antd";
 import {
   EyeInvisibleOutlined,
@@ -6,42 +6,50 @@ import {
   UserOutlined,
   MailOutlined,
   LockOutlined,
-  SyncOutlined,
+  // SyncOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { SyncOutlined } from "@ant-design/icons";
 import Link from "next/link";
+import { Context } from "../context";
+import { useRouter } from "next/router";
 
-export default function Register() {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [loading, setloading] = useState(false);
+const Register = () => {
+  const [name, setName] = useState("Ryan");
+  const [email, setEmail] = useState("ryan@gmail.com");
+  const [password, setPassword] = useState("rrrrrr");
+  const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e) {
+  const {
+    state: { user },
+  } = useContext(Context);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user !== null) router.push("/");
+  }, [user]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    // console.table({ name, email, password });
     try {
-      setloading(true);
-      const { data } = await axios.post(`http://localhost:8000/api/register`, {
+      setLoading(true);
+      const { data } = await axios.post(`/api/register`, {
         name,
         email,
         password,
       });
-
-      toast(data);
-      // console.log(data);
-      setloading(false);
-    } 
-    catch (err) {   
+      // console.log("REGISTER RESPONSE", data);
+      toast("Registration successful. Please login.");
+      setLoading(false);
+    } catch (err) {
       toast(err.response.data);
-      // console.log(err.response);
-      setloading(false);
+      setLoading(false);
     }
-    setName("");
-    setPassword("");
-    setEmail("");
-  }
+  };
 
   return (
     <>
@@ -91,4 +99,6 @@ export default function Register() {
       </form>
     </>
   );
-}
+};
+
+export default Register;

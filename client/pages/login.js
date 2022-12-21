@@ -1,4 +1,4 @@
-import Header from "../comps/Header";
+import Header from "../components/Header";
 import { Input } from "antd";
 import {
   EyeInvisibleOutlined,
@@ -7,49 +7,56 @@ import {
   LockOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { Context } from "../context";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
-export default function Login() {
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [loading, setloading] = useState(false);
+const Login = () => {
+  const [email, setEmail] = useState("ryan@gmail.com");
+  const [password, setPassword] = useState("rrrrrr");
+  const [loading, setLoading] = useState(false);
 
-  const router=useRouter();
-  const {state, dispatch} = useContext(Context);
-  console.log("state: ", state);
+  // state
+  const {
+    state: { user },
+    dispatch,
+  } = useContext(Context);
+  // const { user } = state;
 
-  async function handleSubmit(e) {
+  // router
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user !== null) router.push("/");
+  }, [user]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    // console.table({ name, email, password });
     try {
-      setloading(true);
-      const { data } = await axios.post(`http://localhost:8000/api/login`, {
+      setLoading(true);
+      const { data } = await axios.post(`/api/login`, {
         email,
         password,
       });
-
-      //4. dispatch the context
-      dispatch({type: "Login", payload: data});
+      // console.log("LOGIN RESPONSE", data);
+      dispatch({
+        type: "LOGIN",
+        payload: data,
+      });
+      // save in local storage
       window.localStorage.setItem("user", JSON.stringify(data));
-
-      toast("Welcome "+data.name+" to this e-learning exposure!");
-      console.log("login res",data);
-      setloading(false);
-
+      // redirect
       router.push("/");
-    } 
-    catch (err) {   
+      // setLoading(false);
+    } catch (err) {
       toast(err.response.data);
-      console.log("login res",err.response.data);
-      setloading(false);
+      setLoading(false);
     }
-    setPassword("");
-    setEmail("");
-  }
+  };
 
   return (
     <>
@@ -90,4 +97,6 @@ export default function Login() {
       </form>
     </>
   );
-}
+};
+
+export default Login;

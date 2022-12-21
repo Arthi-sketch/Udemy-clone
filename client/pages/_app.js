@@ -2,7 +2,7 @@ import Head from "next/head";
 import "../styles/globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "antd/dist/antd.css";
-import NavBar from "../comps/NavBar";
+import NavBar from "../components/NavBar";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Provider } from "../context";
